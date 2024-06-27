@@ -3,7 +3,7 @@
 	<test name="Test">
 		<parameter name="browser" value="chrome" />
 		<classes>
-			<class name="com.qa.test.testcases.GoogleHomePage" />
+			<class name="sample.GoogleHomePage" />
 		</classes>
 	</test>
 </suite>
