@@ -1,0 +1,50 @@
+name: Selenium TestNG
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to run tests'
+        required: true
+        default: 'chrome'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      selenium:
+        image: selenium/standalone-${{ github.event.inputs.browser }}:latest
+        ports:
+          - 4444:4444
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-maven
+
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+
+    - name: Run Tests with Maven
+      env:
+        BROWSER: ${{ github.event.inputs.browser }}
+      run: |
+        mvn test -Dbrowser=${BROWSER}
